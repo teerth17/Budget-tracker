@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Registration Form</title>
+</head>
+<body>
+<form action="#" th:action="@{/register}" th:object="${webUser}" method="post">
+    <table>
+        <tr>
+            <td>Email Address:</td>
+            <td><input type="text" th:field="*{email}" /></td>
+            <td th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email Error</td>
+        </tr>
+        <tr>
+            <td>First Name:</td>
+            <td><input type="text" th:field="*{firstName}" /></td>
+            <td th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}">Name Error</td>
+        </tr>
+        <tr>
+            <td>Last Name:</td>
+            <td><input type="text" th:field="*{lastName}" /></td>
+            <td th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}">Last Name Error</td>
+        </tr>
+        <tr>
+            <td>Password:</td>
+            <td><input type="password" th:field="*{password}" /></td>
+            <td th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password Error</td>
+        </tr>
+
+        <tr>
+            <td>Repeat Password:</td>
+            <td><input type="password" th:field="*{repeatPassword}" required /></td>
+            <td th:if="${#fields.hasErrors('repeatPassword')}"
+                th:errors="*{repeatPassword}">Second Password Error</td>
+        </tr>
+
+        <tr>
+            <td><button type="submit">Submit</button></td>
+            <td></td>
+        </tr>
+    </table>
+
+</form>
+
+<div th:if="${errorMessage != null}" style="color: red;">
+    <p th:text="${errorMessage}"></p>
+</div>
+
+</body>
+</html>

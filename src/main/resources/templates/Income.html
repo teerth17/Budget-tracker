@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title> Add Income</title>
+</head>
+<body>
+<form th:action="@{/userHome/addIncome}" th:object="${income}" method="post">
+    <table>
+
+        <tr>
+            <td>Title:</td>
+            <td><input type="text" th:field="*{title}" /></td>
+            <td th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Title Error</td>
+        </tr>
+        <tr>
+            <td>Description:</td>
+            <td><input type="text" th:field="*{description}" /></td>
+            <td th:if="${#fields.hasErrors('description')}" th:errors="*{description}">Description Error</td>
+        </tr>
+        <tr>
+            <td>Amount:</td>
+            <td><input type="number" th:field="*{amount}" /></td>
+            <td th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}">Amount Error</td>
+        </tr>
+
+        <tr>
+            <td>Automatic Add:</td>
+            <td>
+                <select name="interval">
+                    <option value="" selected>-- Select Interval --</option>
+                    <option value="5s">5 Seconds</option>
+                    <option value="10s">10 Seconds</option>
+                    <option value="day">Day</option>
+                    <option value="week">Week</option>
+                    <option value="month">Month</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><button type="submit">Add Income</button></td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <td><a th:href="@{/userHome(id=${userId})}">Home</a></td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <td><button th:href="@{/login}">Logout</button></td>
+            <td></td>
+        </tr>
+    </table>
+</form>
+
+<div th:if="${errorMessage != null}" style="color: red;">
+    <p th:text="${errorMessage}"></p>
+</div>
+</body>
+</html>

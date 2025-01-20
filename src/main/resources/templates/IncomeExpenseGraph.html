@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Income vs Expense Trend</title>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart(){
+
+        let userId = document.getElementById("userId").value;
+        let timeRange = document.getElementById("timeRange").value;
+        console.log(timeRange);
+        console.log(userId);
+
+
+            fetch(`/userHome/income-expense-trend-data?id=${userId}&range=${timeRange}`)
+                .then(response => response.json())
+                .then(data => {
+
+                console.log("chart data",data);
+                    var chartData = google.visualization.arrayToDataTable(data);
+
+                    var options = {
+                        title: 'Income vs Expense',
+                        curveType: 'function',
+                        legend: { position: 'bottom' },
+                        hAxis: { title: 'Time Period' },
+                        vAxis: { title: 'Amount ($)' },
+                        colors: ['#4CAF50', '#FF5733'],
+                        pointSize: 5,
+                        lineWidth: 3
+                    };
+
+        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+                    chart.draw(chartData, options);
+                })
+                .catch(error => console.error('Error loading chart data:', error));
+        }
+    </script>
+
+</head>
+<body>
+<h2>Income vs Expense Trend</h2>
+<select id="timeRange" onchange="drawChart()">
+    <option value="30days">Last 30 Days</option>
+    <option value="month">This Month</option>
+    <option value="lastMonth">Last Month</option>
+    <option value="year">This Year</option>
+</select>
+
+<input type="hidden" id="userId" th:value="${userId}">
+<div id="chart_div" style="width: 900px; height: 500px;"></div>
+</body>
+</html>

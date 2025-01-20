@@ -1,0 +1,57 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Customer Login Page</title>
+    <style>
+        .success-popup {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 10px;
+            border-radius: 4px;
+            position: fixed;
+            top: 10%; /* Adjust this value for vertical positioning */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+    </style>
+
+</head>
+<body>
+
+<div th:if="${successMessage}" id="successPopup" class="success-popup" th:text="${successMessage}"></div>
+<H4>Your Custom Login Page:</H4>
+<form name="f" th:action="@{/login}" method="post">
+    <H4>Please Login here</H4>
+    <div th:if="${param.error}">Invalid username and password.</div>
+    <div th:if="${param.logout}">You have been logged out.</div>
+    <div th:if="${errorMessage != null}" class="alert alert-danger">
+        <p th:text="${errorMessage}"></p>
+    </div>
+
+
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" />
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" />
+
+    <div><button type="submit">Log in</button></div>
+</form>
+<br>
+<li class="nav-item">
+    <a class="nav-link" href="/register">Register</a>
+</li>
+
+<script>
+    setTimeout(() => {
+        const popup = document.getElementById('successPopup');
+        if (popup) {
+            popup.style.opacity = '0';
+            setTimeout(() => popup.remove(), 500);
+        }
+    }, 6000);
+</script>
+</body>
+</html>
