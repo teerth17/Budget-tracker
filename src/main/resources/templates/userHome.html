@@ -133,6 +133,13 @@
 <h2>Welcome to Home Page</h2>
 <p>Logged in as User ID: <span th:text="${userId}"></span></p>
 
+<div id="budgetAlert" class="alert" style="display: none; text-align: center; padding: 15px; margin: 20px; border-radius: 8px; font-size: 1.2rem; font-weight: bold;">
+    <span id="budgetMessage"></span>
+    <div class="progress" style="height: 10px; margin-top: 10px;">
+        <div id="budgetProgress" class="progress-bar" role="progressbar" style="width: 0%;"></div>
+    </div>
+    <button onclick="dismissAlert()" class="btn btn-sm btn-light" style="margin-top: 10px;">Dismiss</button>
+</div>
 
 <div class="totals-container">
     <div class="totals-box">
@@ -212,6 +219,12 @@
 <br /><br />
 
 <a th:href="@{/userHome/income-expense-trend(id=${userId})}">Graphical Representation</a>
+
+<br />
+
+<a th:href="@{/userHome/budget/setLimit(id=${userId})}">Set Budget</a>
+<br />
+
 <a th:href="@{/login}">Logout</a>
 
 
@@ -219,6 +232,36 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var totalExpense = parseFloat("[[${totalExpense}]]");
+        var budgetLimit = parseFloat("[[${budgetLimit}]]");
+        var alertBox = document.getElementById("budgetAlert");
+        var messageBox = document.getElementById("budgetMessage");
+        var progressBar = document.getElementById("budgetProgress");
+
+        if (!isNaN(totalExpense) && !isNaN(budgetLimit) && budgetLimit > 0) {
+            var percentageUsed = (totalExpense / budgetLimit) * 100;
+            progressBar.style.width = percentageUsed + "%";
+
+            if (percentageUsed >= 100) {
+                alertBox.style.display = "block";
+                alertBox.style.backgroundColor = "#dc3545"; // Red for exceeded budget
+                alertBox.style.color = "white";
+                messageBox.innerText = "⚠️ Budget Limit Exceeded! Reduce expenses to stay within your budget.";
+            } else if (percentageUsed >= 80) {
+                alertBox.style.display = "block";
+                alertBox.style.backgroundColor = "#ffc107"; // Yellow for warning
+                alertBox.style.color = "black";
+                messageBox.innerText = "⚠️ Warning: You have used over 80% of your budget!";
+            }
+        }
+    });
+
+    function dismissAlert() {
+        document.getElementById("budgetAlert").style.display = "none";
+    }
+</script>
 
 
 </body>

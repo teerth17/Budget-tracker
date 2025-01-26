@@ -3,10 +3,8 @@ package com.teerth.budget_app.auth.controllers;
 import com.teerth.budget_app.auth.dao.ExpenseDao;
 import com.teerth.budget_app.auth.dao.IncomeDao;
 import com.teerth.budget_app.auth.dao.UserDao;
-import com.teerth.budget_app.auth.model.Expense;
-import com.teerth.budget_app.auth.model.Income;
-import com.teerth.budget_app.auth.model.User;
-import com.teerth.budget_app.auth.model.WebUser;
+import com.teerth.budget_app.auth.model.*;
+import com.teerth.budget_app.auth.services.BudgetLimitService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -53,7 +51,8 @@ public class userController {
     @Autowired
     private ExpenseDao expenseDao;
 
-
+    @Autowired
+    private BudgetLimitService budgetLimitService;
 
     @GetMapping("/register")
     public String displayForm(WebUser webUser, Model model){
@@ -150,9 +149,13 @@ public class userController {
             totalExpense += expenseList.get(i).getAmount();
         }
 
+        Budget budget =  budgetLimitService.getBudgetWithAccountId(id);
+        Double budgetLimit = budget.getBudget_amount();
+
         System.out.println("Total income: " + totalIncome);
         System.out.println("Total expense: " + totalExpense);
 
+        model.addAttribute("budgetLimit",budgetLimit);
         model.addAttribute("totalIncome",totalIncome);
         model.addAttribute("totalExpense",totalExpense);
         model.addAttribute("incomeList",incomeList);

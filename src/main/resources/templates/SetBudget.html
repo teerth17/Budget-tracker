@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Set Budget</title>
+
+
+</head>
+<body>
+<form th:action="@{/userHome/budget/setLimit(id=${userId})}" th:object="${budget}" method="post">
+  <input type="number" th:field="*{budget_amount}" placeholder="Enter budget limit">
+  <button type="submit"> Add Budget Limit</button>
+</form>
+
+<div th:if="${errorMessage != null}" style="color: red;">
+  <p th:text="${errorMessage}"></p>
+</div>
+</body>
+</html>

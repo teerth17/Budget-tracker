@@ -45,7 +45,13 @@ CREATE TABLE IF NOT EXISTS income(
     income_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     title VARCHAR(50),
     description VARCHAR(200),
-    amount INT NOT NULL,
+    amount DOUBLE PRECISION NOT NULL,
+    account_id UUID REFERENCES account(account_id)
+);
+
+CREATE TABLE IF NOT EXISTS budget(
+    budget_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    amount DOUBLE PRECISION NOT NULL,
     account_id UUID REFERENCES account(account_id)
 );
 
