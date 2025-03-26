@@ -78,5 +78,3 @@ bin/
 .DS_Store
 Thumbs.db
 
-compose.yaml
-.env

@@ -7,7 +7,7 @@ services:
     environment:
       - POSTGRES_DB=budget
       - POSTGRES_USER=budget
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_PASSWORD=${DOCKER_PASSWORD}
     volumes:
       - budget-app-db:/var/lib/postgresql/data
     restart: always
@@ -21,10 +21,10 @@ services:
     environment:
       - DB_URL=jdbc:postgresql://db:5432/budget
       - DB_USER=budget
-      - DB_PASSWORD=password
+      - DB_PASSWORD=${DOCKER_PASSWORD}
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/budget
       - SPRING_DATASOURCE_USERNAME=budget
-      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_DATASOURCE_PASSWORD=${DOCKER_PASSWORD}
       - DB_DRIVER=org.postgresql.Driver
     depends_on:
       - db
