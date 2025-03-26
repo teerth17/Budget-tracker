@@ -41,9 +41,9 @@ public class IncomeDaoImpl implements IncomeDao {
 
 
     @Override
-    public UUID addIncome(Income income){
-        String SQL = "insert into income(title,description,amount,account_id) values (?,?,?,?) returning income_id";
-        UUID account_id=  jdbcTemplate.queryForObject(SQL, new Object[]{income.getTitle(), income.getDescription(),income.getAmount(),income.getUserAccountId()},UUID.class);
+    public UUID addIncome(Income income,UUID categoryId){
+        String SQL = "insert into income(title,description,amount,account_id,category_id) values (?,?,?,?,?) returning income_id";
+        UUID account_id=  jdbcTemplate.queryForObject(SQL, new Object[]{income.getTitle(), income.getDescription(),income.getAmount(),income.getUserAccountId(),categoryId},UUID.class);
 
         return account_id;
     }
@@ -53,7 +53,7 @@ public class IncomeDaoImpl implements IncomeDao {
     @Override
     public List<Income> getAllIncomeByAccountId(UUID account_id){
         try{
-            String SQL = "select income_id,title,description,amount,date,automated,interval from income where account_id=?";
+            String SQL = "select income_id,title,description,amount,date,automated,interval,category_id from income where account_id=?";
             return jdbcTemplate.query(SQL,new Object[]{account_id}, new UserMapper());
         }catch (DataAccessException e){
             throw e;
@@ -61,9 +61,21 @@ public class IncomeDaoImpl implements IncomeDao {
     }
 
     @Override
+    public List<Income> getLastFiveIncomeByAccountId(UUID account_id){
+        try {
+            String SQL = "select income_id,title,description,amount,date,automated,interval,category_id from income where account_id=? " +
+                    "order by date desc limit 5";
+            return jdbcTemplate.query(SQL,new Object[]{account_id},new UserMapper());
+        }
+        catch (DataAccessException e){
+            throw  e;
+        }
+    }
+
+    @Override
     public List<Income> getIncomeByIncomeId(UUID income_id){
         try{
-            String SQL = "select income_id,title,description,amount,date,automated,interval from income where income_id=?";
+            String SQL = "select income_id,title,description,amount,date,automated,interval, \"interval\",category_id from income where income_id=?";
             return jdbcTemplate.query(SQL,new Object[]{income_id}, new UserMapper());
         }catch (DataAccessException e){
             throw e;
@@ -97,6 +109,7 @@ public class IncomeDaoImpl implements IncomeDao {
             income.setDate(rs.getString("date"));
             income.setAutomatedStatus(rs.getBoolean("automated"));
             income.setInterval(rs.getString("interval"));
+            income.setCategoryId(UUID.fromString(rs.getString("category_id")));
             return income;
         }
     }
@@ -112,10 +125,10 @@ public class IncomeDaoImpl implements IncomeDao {
     }
 
     @Override
-    public List<Income> getIncomeByTitle(String title){
+    public List<Income> getIncomeByTitleAndAccountID(String title,UUID account_id){
         try {
-            String SQL = "select * from income where title=?";
-            return jdbcTemplate.query(SQL,new Object[]{title},new UserMapper());
+            String SQL = "select * from income where title=? and account_id=?";
+            return jdbcTemplate.query(SQL,new Object[]{title,account_id},new UserMapper());
 
         }
         catch (DataAccessException e){
@@ -124,10 +137,10 @@ public class IncomeDaoImpl implements IncomeDao {
     }
 
     @Override
-    public void updateIncomeAmountByTitle(String title,double amount){
+    public void updateIncomeAmountByTitleAndAccountId(String title,double amount,UUID account_id){
         try {
-            String SQL = "update income set amount=? where title=?";
-            jdbcTemplate.update(SQL,amount,title);
+            String SQL = "update income set amount=? where title=? and account_id=?";
+            jdbcTemplate.update(SQL,amount,title,account_id);
         }
         catch (DataAccessException e){
             throw e;
@@ -140,6 +153,13 @@ public class IncomeDaoImpl implements IncomeDao {
         String SQL = "select to_char(date, 'YYYY-MM') as month, coalesce(sum(amount),0) from income where account_id=? and date >= ? and date <= ? group by month order by month";
 
         return jdbcTemplate.query(SQL,new Object[]{account_id,startDate,endDate},(rs,rowNum) -> new Object[]{rs.getString(1),rs.getDouble(2)});
+    }
+
+    @Override
+    public UUID getCategoryByIncomeId(UUID income_id){
+        String SQL = "select category_id from income where income_id=?";
+
+        return jdbcTemplate.queryForObject(SQL, new Object[]{income_id}, UUID.class);
     }
 
 }

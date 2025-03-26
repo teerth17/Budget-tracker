@@ -15,6 +15,6 @@ public interface UserDao {
 
     User getUserByAccountId(UUID account_id);
 
-
+    public String getFirstname(UUID account_id);
 
 }

@@ -3,17 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <title>Set Budget</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<form th:action="@{/userHome/budget/setLimit(id=${userId})}" th:object="${budget}" method="post">
-  <input type="number" th:field="*{budget_amount}" placeholder="Enter budget limit">
-  <button type="submit"> Add Budget Limit</button>
-</form>
+<body class="bg-gray-100 text-gray-900">
 
-<div th:if="${errorMessage != null}" style="color: red;">
-  <p th:text="${errorMessage}"></p>
+<!-- Navbar -->
+<nav class="bg-blue-600 p-4 text-white shadow-md">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+        <h1 class="text-xl font-semibold">Budget App</h1>
+        <a th:href="@{'/userHome?id=' + ${userId}}" class="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200">Home</a>
+
+    </div>
+</nav>
+
+<!-- Page Container -->
+<div class="max-w-4xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
+    <h2 class="text-2xl font-semibold text-center">Set Budget</h2>
+
+    <!-- Error Message -->
+    <div th:if="${errorMessage != null}" class="bg-red-100 text-red-700 p-3 rounded-md mt-4 text-center">
+        <p th:text="${errorMessage}"></p>
+    </div>
+
+    <!-- Category-wise Budget Section -->
+    <div class="mt-6">
+        <h3 class="text-xl font-semibold mb-3">Category-wise Budget</h3>
+        <form th:action="@{/userHome/budget/setLimit(id=${userId})}" th:object="${budget}" method="post" class="space-y-4">
+            <label for="category" class="block text-gray-700 font-medium">Select Category</label>
+            <select id="category" name="category_id" class="w-full p-2 border rounded-md">
+                <option th:each="category: ${categories}"
+                        th:value="${category.category_id}"
+                        th:text="${category.name}">
+                </option>
+            </select>
+
+            <input type="number" th:field="*{budget_amount}" placeholder="Enter budget limit"
+                   class="w-full p-2 border rounded-md" >
+
+            <div class="flex gap-2">
+                <button type="submit" name="action" value="add" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-700">Add</button>
+                <button type="submit" name="action" value="update" class="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-700">Update</button>
+                <button type="submit" name="action" value="delete" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700">Delete</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- General Budget Section -->
+    <div class="mt-8">
+        <h3 class="text-xl font-semibold mb-3">General Budget</h3>
+        <form th:action="@{/userHome/budget/setLimit(id=${userId})}" th:object="${budget}" method="post" class="space-y-4">
+            <input type="number" th:field="*{budget_amount}" placeholder="Enter general budget limit"
+                   class="w-full p-2 border rounded-md" required>
+
+            <div class="flex gap-2">
+                <button type="submit" name="action" value="add" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-700">Add</button>
+                <button type="submit" name="action" value="update" class="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-700">Update</button>
+                <button type="submit" name="action" value="delete" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700">Delete</button>
+            </div>
+        </form>
+    </div>
 </div>
+
 </body>
 </html>

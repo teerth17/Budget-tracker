@@ -15,6 +15,15 @@ public class Income {
     private UUID income_id;
     private UUID account_id;
     private String interval;
+    private UUID category_id;
+
+    // Getter and setter for category
+    public UUID getCategoryId() {
+        return category_id;
+    }
+    public void setCategoryId(UUID category_id) {
+        this.category_id = category_id;
+    }
 
 
 //    public Income(String description,int amount){
@@ -86,6 +95,7 @@ public class Income {
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", amount=" + amount +
+                ", catergory_id" + category_id +
                 '}';
     }
 

@@ -1,29 +1,32 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Login Form</title>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<form action="#" th:action="@{/login}" th:object="${user}" method="post">
-    <table>
-        <tr>
-            <td>Enter Email:</td>
-            <td><input type="text" th:field="*{email}" /></td>
-            <td th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email Error</td>
-        </tr>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
 
-        <tr>
-            <td>Enter Password:</td>
-            <td><input type="text" th:field="*{password}" /> </td>
-            <td th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password Error</td>
-        </tr>
+<div class="bg-white p-8 rounded-lg shadow-md w-96">
+    <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
 
-        <tr>
-            <td><button type="submit">Submit</button></td>
-            <td></td>
-        </tr>
-    </table>
-</form>
+    <form th:action="@{/login}" method="post">
+        <div class="mb-4">
+            <label class="block text-gray-700">Username</label>
+            <input type="text" name="username" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700">Password</label>
+            <input type="password" name="password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-700">Login</button>
+    </form>
+
+    <div class="text-center mt-4">
+        <p class="text-gray-600">Don't have an account? <a th:href="@{/register}" class="text-blue-500 hover:underline">Register</a></p>
+    </div>
+</div>
 
 </body>
 </html>

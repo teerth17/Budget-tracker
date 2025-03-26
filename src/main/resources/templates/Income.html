@@ -1,32 +1,60 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <title> Add Income</title>
+    <meta charset="UTF-8">
+    <title>Add Income</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 500px;
+            margin-top: 50px;
+        }
+        .card {
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            width: 100%;
+        }
+        .error-message {
+            color: red;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
-<form th:action="@{/userHome/addIncome}" th:object="${income}" method="post">
-    <table>
+<div class="container">
+    <div class="card">
+        <h3 class="text-center">Add Income</h3>
 
-        <tr>
-            <td>Title:</td>
-            <td><input type="text" th:field="*{title}" /></td>
-            <td th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Title Error</td>
-        </tr>
-        <tr>
-            <td>Description:</td>
-            <td><input type="text" th:field="*{description}" /></td>
-            <td th:if="${#fields.hasErrors('description')}" th:errors="*{description}">Description Error</td>
-        </tr>
-        <tr>
-            <td>Amount:</td>
-            <td><input type="number" th:field="*{amount}" /></td>
-            <td th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}">Amount Error</td>
-        </tr>
+        <form th:action="@{/userHome/addIncome}" th:object="${income}" method="post">
 
-        <tr>
-            <td>Automatic Add:</td>
-            <td>
-                <select name="interval">
+            <div class="form-group">
+                <label>Title:</label>
+                <input type="text" class="form-control" th:field="*{title}" placeholder="Enter income title">
+                <small th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="error-message">Title Error</small>
+            </div>
+
+            <div class="form-group">
+                <label>Description:</label>
+                <input type="text" class="form-control" th:field="*{description}" placeholder="Enter description">
+                <small th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error-message">Description Error</small>
+            </div>
+
+            <div class="form-group">
+                <label>Amount:</label>
+                <input type="number" class="form-control" th:field="*{amount}" placeholder="Enter amount">
+                <small th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}" class="error-message">Amount Error</small>
+            </div>
+
+            <div class="form-group">
+                <label>Automatic Add:</label>
+                <select name="interval" class="form-control">
                     <option value="" selected>-- Select Interval --</option>
                     <option value="5s">5 Seconds</option>
                     <option value="10s">10 Seconds</option>
@@ -34,27 +62,31 @@
                     <option value="week">Week</option>
                     <option value="month">Month</option>
                 </select>
-            </td>
-        </tr>
-        <tr>
-            <td><button type="submit">Add Income</button></td>
-            <td></td>
-        </tr>
+            </div>
 
-        <tr>
-            <td><a th:href="@{/userHome(id=${userId})}">Home</a></td>
-            <td></td>
-        </tr>
+            <div class="form-group">
+                <label>Category:</label>
+                <select th:field="*{categoryId}" name="categoryId" class="form-control">
+                    <option th:each="cat: ${categories}" th:value="${cat.category_id}" th:text="${cat.name}"></option>
+                </select>
+            </div>
 
-        <tr>
-            <td><button th:href="@{/login}">Logout</button></td>
-            <td></td>
-        </tr>
-    </table>
-</form>
+            <button type="submit" class="btn btn-primary">Add Income</button>
+        </form>
 
-<div th:if="${errorMessage != null}" style="color: red;">
-    <p th:text="${errorMessage}"></p>
+        <div th:if="${errorMessage != null}" class="text-center mt-3 text-danger">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
+        <div class="mt-3 text-center">
+            <a th:href="@{/userHome(id=${userId})}" class="btn btn-secondary btn-sm">Home</a>
+            <a th:href="@{/login}" class="btn btn-danger btn-sm">Logout</a>
+        </div>
+    </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

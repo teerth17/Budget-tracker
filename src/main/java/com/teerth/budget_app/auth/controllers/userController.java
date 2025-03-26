@@ -1,10 +1,14 @@
 package com.teerth.budget_app.auth.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teerth.budget_app.auth.dao.ExpenseDao;
 import com.teerth.budget_app.auth.dao.IncomeDao;
 import com.teerth.budget_app.auth.dao.UserDao;
 import com.teerth.budget_app.auth.model.*;
+import com.teerth.budget_app.auth.services.AddExpenseService;
+import com.teerth.budget_app.auth.services.AddUpdateIncomeService;
 import com.teerth.budget_app.auth.services.BudgetLimitService;
+import com.teerth.budget_app.auth.services.CategoryService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -24,14 +28,17 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+
 
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.security.Principal;
+import java.util.*;
 
 @Controller
-@SessionAttributes("user")
+//@SessionAttributes("user")
 public class userController {
     @Autowired
     private UserDao userDao;
@@ -54,6 +61,15 @@ public class userController {
     @Autowired
     private BudgetLimitService budgetLimitService;
 
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private AddUpdateIncomeService addUpdateIncomeService;
+
+    @Autowired
+    private AddExpenseService addExpenseService;
+
     @GetMapping("/register")
     public String displayForm(WebUser webUser, Model model){
         model.addAttribute("webUser", new WebUser());
@@ -61,8 +77,7 @@ public class userController {
     }
 
     @PostMapping("/register")
-    public String processFrom(@Valid@ModelAttribute("webUser") WebUser webUser, BindingResult result,Model model, HttpServletRequest request,
-                              HttpServletResponse response){
+    public String processFrom(@Valid@ModelAttribute("webUser") WebUser webUser, BindingResult result,Model model, HttpServletRequest request, HttpServletResponse response){
         System.out.println("user details" + webUser.getEmail());
 
         if(result.hasErrors()){
@@ -134,45 +149,132 @@ public class userController {
     @GetMapping("/userHome")
     public String displayHome(@RequestParam("id") UUID id,Model model) {
 
-        List<Income> incomeList = incomeDao.getAllIncomeByAccountId(id);
-        List<Expense> expenseList = expenseDao.getAllExpenseByAccountId(id);
-        System.out.println("list of incomes" + incomeList);
-        System.out.println("list of expense " + expenseList);
+        System.out.println("got this id: " + id);
+        String firstName = userDao.getFirstname(id);
+        System.out.println("got this first name: " + firstName);
+        List<IncomeDTO> allIncomeList = addUpdateIncomeService.getIncomeListWithCategoryName(id);
+        List<ExpenseDTO> allExpenseList = addExpenseService.getExpenseListWithCategoryName(id);
+
+        System.out.println("all incoems: " + allIncomeList);
+        System.out.println("all expense: " + allExpenseList);
+
+        List<IncomeDTO> lastFiveIncomeList = addUpdateIncomeService.getLastFiveIncomeByAccountId(id);
+        List<ExpenseDTO> lastFiveExpenseList = addExpenseService.getLastFiveExpenseByAccountId(id);
+        System.out.println("list of last 5 incomes" + lastFiveIncomeList);
+        System.out.println("list of last 5expense " + lastFiveExpenseList);
 
 
         double totalIncome = 0;
         double totalExpense = 0;
-        for (int i = 0; i < incomeList.size(); i++) {
-            totalIncome += incomeList.get(i).getAmount();
+        for (int i = 0; i < allIncomeList.size(); i++) {
+            totalIncome += allIncomeList.get(i).getIncome().getAmount();
         }
-        for (int i = 0; i <expenseList.size() ; i++) {
-            totalExpense += expenseList.get(i).getAmount();
+        for (int i = 0; i <allExpenseList.size() ; i++) {
+            totalExpense += allExpenseList.get(i).getExpense().getAmount();
         }
 
-        Budget budget =  budgetLimitService.getBudgetWithAccountId(id);
-        Double budgetLimit = budget.getBudget_amount();
+        double generalBudgetLimit = budgetLimitService.getTotalBudgetWithAccountId(id);
+
+        Map<String,Double> categoryBudgets = budgetLimitService.getCategoryBudgetsByAccountId(id);
+        Map<UUID, Double> categoryExpenses = addExpenseService.getCategoryWiseExpenses(id);
+
+        Map<UUID,String> categoryNames = categoryService.getCategoryNames();
+
+        System.out.println("cb: " + categoryBudgets);
+
+        Map<String,Double> categoryExpense = new HashMap<>();
+        for (ExpenseDTO expenseDTO: allExpenseList){
+            System.out.println("expense category id: " + expenseDTO.getExpense().getCategoryId());
+
+            String categoryName = "General";
+            if (expenseDTO.getExpense().getCategoryId() != null) {
+                Category category = categoryService.findByd(expenseDTO.getExpense().getCategoryId());
+                if (category != null) {
+                    categoryName = category.getName();
+                }
+            }
+
+//            String category = expense.getCategory().getName();
+            System.out.println("category: " + categoryName);
+            categoryExpense.put(categoryName,categoryExpense.getOrDefault(categoryName,0.0) + expenseDTO.getExpense().getAmount());
+        }
+
+        System.out.println("bbbbbbbb" + generalBudgetLimit);
+        model.addAttribute("categoryBudgets", categoryBudgets);
+        model.addAttribute("categoryExpenses", categoryExpense);
+
+
 
         System.out.println("Total income: " + totalIncome);
         System.out.println("Total expense: " + totalExpense);
 
-        model.addAttribute("budgetLimit",budgetLimit);
-        model.addAttribute("totalIncome",totalIncome);
-        model.addAttribute("totalExpense",totalExpense);
-        model.addAttribute("incomeList",incomeList);
-        model.addAttribute("expenseList",expenseList);
-        model.addAttribute("userId", id);
-        return "userHome";
+        if(lastFiveIncomeList == null){
+            lastFiveIncomeList = new ArrayList<>();
+        }
+        if (lastFiveExpenseList == null){
+            lastFiveExpenseList = new ArrayList<>();
+            System.out.println("expense is null here");
+        }
+
+        System.out.println("general budget limit: " + generalBudgetLimit);
+        System.out.println("category Budgets: " + categoryBudgets);
+        System.out.println("categoryExpenses: " + categoryExpenses);
+
+//        Gson gson = new Gson();
+//        String categoryBudgetsJson = gson.toJson(categoryBudgets);
+//        String categoryExpensesJson = gson.toJson(categoryExpenses);
+
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+            String categoryBudgetsJson = objectMapper.writeValueAsString(categoryBudgets);
+            String categoryExpensesJson = objectMapper.writeValueAsString(categoryExpenses);
+            String categoryNamesJson = objectMapper.writeValueAsString(categoryNames);
+
+            System.out.println("json version: " + categoryBudgetsJson);
+            System.out.println("json expense: " + categoryExpensesJson);
+            System.out.println("json names: " + categoryNamesJson);
+
+            model.addAttribute("budgetLimit",generalBudgetLimit);
+            model.addAttribute("totalIncome",totalIncome);
+            model.addAttribute("totalExpense",totalExpense);
+            model.addAttribute("incomeList",lastFiveIncomeList);
+            model.addAttribute("expenseList",lastFiveExpenseList);
+            model.addAttribute("userId", id);
+            model.addAttribute("firstName", firstName);
+            model.addAttribute("categoryBudgetsJson", categoryBudgetsJson);
+            model.addAttribute("categoryExpensesJson", categoryExpensesJson);
+            model.addAttribute("categoryNamesJson",categoryNamesJson);
+            return "userHome";
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+       return "userHome";
     }
 
     @PostMapping("/userHome")
-    public String processHome(@RequestParam("id") UUID id, @RequestParam(value = "selectedIncome",required = false) UUID income_id, @RequestParam(value = "selectedExpense",required = false) UUID expense_id, Model model){
+    public String processHome(@RequestParam("id") UUID id,
+@RequestParam(value = "selectedIncome",required = false) UUID income_id,
+                              @RequestParam(value = "automatedStatus", required = false) boolean automatedStatus,
+                              @RequestParam(value = "selectedExpense",required = false) UUID expense_id, Model model){
         System.out.println("enterd lsnfkl");
         System.out.println("we got this id: " + income_id);
         System.out.println("expense_id " + expense_id);
         System.out.println("end...");
+        System.out.println("got status from list: " + automatedStatus);
 
         if(income_id != null && id != null){
+            List<Income> incomeAllAttributes = incomeDao.getIncomeByIncomeId(income_id);
+            Income income = incomeAllAttributes.get(0);
+            System.out.println("got income before delete: " + income);
+
+            if(automatedStatus){
+                System.out.println("entered with true AS...");
+                addUpdateIncomeService.stopAutomation(income);
+                System.out.println("stopped auto income");
+            }
+            System.out.println("entered to delete");
             incomeDao.deleteIncome(income_id);
+            System.out.println("deleted");
             return "redirect:/userHome?id=" + id;
         }
 
@@ -184,6 +286,33 @@ public class userController {
         return "redirect:/userHome?id=" + id;
     }
 
+    @GetMapping("/userHome/income-expense-list")
+    public String showIncomeExpenseList(@RequestParam("id") UUID id, Model model,
+                                        Principal principal){
+        System.out.println("Enter income-expense-list route");
+        System.out.println("id in income-expense: " + id);
+
+        List<IncomeDTO> incomes = addUpdateIncomeService.getIncomeListWithCategoryName(id);
+        System.out.println("incomes from income-expense: " + incomes.size());
+        List<ExpenseDTO> expenses = addExpenseService.getExpenseListWithCategoryName(id);
+        System.out.println("expesnes from income-expense: " + expenses.size());
+        if(incomes == null){
+            incomes = new ArrayList<>();
+        }
+        if(expenses == null){
+            expenses = new ArrayList<>();
+            System.out.println("entered in expense null");
+        }
+        System.out.println("list income: " + incomes);
+        System.out.println("list expesnes: " + expenses);
+
+        model.addAttribute("userId",id);
+        model.addAttribute("incomes",incomes);
+        model.addAttribute("expenses",expenses);
+
+        return "income-expense-list";
+
+    }
 
 
 //    @GetMapping("/login")

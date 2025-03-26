@@ -1,9 +1,12 @@
 package com.teerth.budget_app.auth.controllers;
 
+import com.teerth.budget_app.auth.dao.CategoryDao;
 import com.teerth.budget_app.auth.dao.IncomeDao;
 import com.teerth.budget_app.auth.dao.UserDao;
+import com.teerth.budget_app.auth.model.Category;
 import com.teerth.budget_app.auth.model.Income;
 import com.teerth.budget_app.auth.services.AddUpdateIncomeService;
+import com.teerth.budget_app.auth.services.CategoryService;
 import com.teerth.budget_app.auth.services.IncomeSchedulerService;
 import com.teerth.budget_app.auth.services.MonthlyIncomeExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +40,9 @@ public class IncomeController {
     private MonthlyIncomeExpenseService monthlyIncomeExpenseService;
 
     @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
     private UserDao userDao;
 
     @GetMapping("/userHome/addIncome")
@@ -44,7 +50,11 @@ public class IncomeController {
 
         System.out.println("Entered...");
         model.addAttribute("income", new Income());
+        System.out.println("id: user" + id);
         model.addAttribute("userId",id);
+
+        List<Category> incomeCategories = categoryService.findByType("income");
+        model.addAttribute("categories",incomeCategories);
         return "Income";
     }
 
@@ -113,18 +123,36 @@ public class IncomeController {
     public String processAddIncome(
             @ModelAttribute("income") Income income,
             @RequestParam(name = "interval", required = false) String interval,
+            @RequestParam("categoryId") UUID categoryId,
             Principal principal,
             Model model) {
 
         try{
             String email = principal.getName();
-            UUID accountId = userDao.getUserAccountId(email);
+            UUID accountId;
+            if(email.endsWith(".com")){
+                System.out.println("got email from principal: " + email);
+                accountId = userDao.getUserAccountId(email);
+            }else{
+                accountId = UUID.fromString(email);
+            };
+            System.out.println("here is accointId: " + accountId);
 
             if(accountId != null){
                 income.setUserAccountId(accountId);
-                UUID incomeId = addUpdateIncomeService.addOrUpdateIncome(income,interval);
+
+                Category category = categoryService.findByd(categoryId);
+                income.setCategoryId(category.getCategory_id());
+                income.setUserAccountId(accountId);
+
+                UUID incomeId = addUpdateIncomeService.addOrUpdateIncome(income,interval,categoryId);
+                System.out.println("income for autmoate check.."+incomeId);
                 if(incomeId != null){
+                    System.out.println("redirectig to userHome...");
                     return "redirect:/userHome?id=" + accountId;
+                }else{
+                    System.out.println("incomeId is null");
+                    model.addAttribute("errorMessage","income automated problem");
                 }
             }
 
@@ -142,7 +170,7 @@ public class IncomeController {
     }
 
     @PostMapping("userHome/toggleAutomation")
-    public String processToggleAutomation(@RequestParam("incomeId") String incomeIdStr, @RequestParam("isAutomated") boolean isAutomated, @RequestParam(name = "interval", required = false) String interval, Principal principal, Model model){
+    public String processToggleAutomation(@RequestParam("incomeId") String incomeIdStr, @RequestParam("automatedStatus") boolean isAutomated, Principal principal, Model model){
 
         System.out.println("Entered here");
         System.out.println("got id: "+incomeIdStr);
@@ -155,12 +183,20 @@ public class IncomeController {
         List<Income> incomeList = incomeDao.getIncomeByIncomeId(incomeId);
         Income income = incomeList.get(0);
 
+        UUID categoryId = incomeDao.getCategoryByIncomeId(incomeId);
+
         if(income == null){
             throw new IllegalArgumentException("Income not found");
         }
 
         System.out.println("income status: "+ income.getAutomatedStatus());
-        income.setAutomatedStatus(!isAutomated);
+
+        if(isAutomated){
+            income.setInterval(null);
+            System.out.println("before stop automation");
+            addUpdateIncomeService.stopAutomation(income);
+            System.out.println("Automation stopped..");
+        }
 
 //        if (!isAutomated) {
 //            // Enable automation with interval
@@ -174,20 +210,20 @@ public class IncomeController {
 //            addUpdateIncomeService.stopAutomation(income); // Call a dedicated method to stop automation
 //        }
 
-        if(income.getAutomatedStatus()){
-            if (interval != null && !interval.isEmpty()) {
-                System.out.println("interval.. " + interval);
-                income.setInterval(interval);
-            }
-            System.out.println("interval got: " + interval);
-            System.out.println("got ");
-            addUpdateIncomeService.addOrUpdateIncome(income, interval);
-
-        }else{
-            System.out.println("in else");
-            income.setInterval(null); // Clear interval
-            addUpdateIncomeService.stopAutomation(income);
-        }
+//        if(income.getAutomatedStatus()){
+//            if (interval != null && !interval.isEmpty()) {
+//                System.out.println("interval.. " + interval);
+//                income.setInterval(interval);
+//            }
+//            System.out.println("interval got: " + interval);
+//            System.out.println("got ");
+//            addUpdateIncomeService.addOrUpdateIncome(income, interval,categoryId);
+//
+//        }else{
+//            System.out.println("in else");
+//            income.setInterval(null); // Clear interval
+//            addUpdateIncomeService.stopAutomation(income);
+//        }
 
         return "redirect:/userHome?id=" + accountId;
     }

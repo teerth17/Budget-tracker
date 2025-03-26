@@ -1,273 +1,178 @@
-<!--<!DOCTYPE html>-->
-<!--<html xmlns:th="http://www.thymeleaf.org">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <title>Title</title>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-<!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">-->
-<!--</head>-->
-<!--<body>-->
-<!--    "Welcome to Home Page"-->
-
-<!--    <p> Logged in as User ID: <span th:text="${userId}"></span></p>-->
-
-<!--    <h4>Income list</h4>-->
-<!--    <ul>-->
-<!--&lt;!&ndash;        <li th:each="income : ${incomeList}">&ndash;&gt;-->
-<!--&lt;!&ndash;            <form th:action="@{/userHome}" method="post">&ndash;&gt;-->
-<!--&lt;!&ndash;            <input type="radio" name = "selectedIncome" th:value="${income.income_id}" onchange="toggleDeleteButton('${income.income_id})" />&ndash;&gt;-->
-<!--&lt;!&ndash;            Title: <span th:text="${income.title}"></span>,&ndash;&gt;-->
-<!--&lt;!&ndash;            Description: <span th:text="${income.description}"></span>,&ndash;&gt;-->
-<!--&lt;!&ndash;            Amount: <span th:text="${income.amount}"></span>,&ndash;&gt;-->
-
-<!--&lt;!&ndash;            <button type="submit" id="deleteButton_${income.income_id}" class="btn btn-danger" disabled> Delete</button>&ndash;&gt;-->
-<!--&lt;!&ndash;            </form>&ndash;&gt;-->
-<!--&lt;!&ndash;        </li>&ndash;&gt;-->
-
-<!--        <li th:each="income : ${incomeList}">-->
-<!--            <form th:action="@{/userHome}" method="post">-->
-<!--                <input type="hidden" name="id" th:value="${userId}" />-->
-<!--                <input type="radio" name="selectedIncome" th:value="${income.income_id}" onchange="toggleDeleteButton('${income.income_id}')" />-->
-<!--                Title: <span th:text="${income.title}"></span>,-->
-<!--                Description: <span th:text="${income.description}"></span>,-->
-<!--                Amount: <span th:text="${income.amount}"></span>,-->
-
-<!--                <button type="submit" id="deleteButton_${income.income_id}" class="btn btn-danger" disabled> Delete</button>-->
-<!--            </form>-->
-<!--        </li>-->
-<!--    </ul>-->
-
-<!--    <h4>Expense List</h4>-->
-<!--    <ul>-->
-<!--        <li th:each="expense : ${expenseList}">-->
-<!--            Title: <span th:text="${expense.title}"></span>,-->
-<!--            Description: <span th:text="${expense.description}"></span>,-->
-<!--            Amount: <span th:text="${expense.amount}"></span>-->
-
-<!--        </li>-->
-<!--    </ul>-->
-<!--    <a th:href="@{/userHome/addIncome(id=${userId})}">Add Income</a>-->
-
-<!--    <br />-->
-<!--    <a th:href="@{/userHome/addExpense(id=${userId})}">Add Expense</a>-->
-
-<!--<br /> <br />-->
-<!--    <a th:href="@{/login}">Logout</a>-->
-
-
-<!--   -->
-<!--    <script>-->
-<!--&lt;!&ndash;        function toggleDeleteButton(income_id) {&ndash;&gt;-->
-<!--&lt;!&ndash;            const allDeleteButtons = document.querySelectorAll('button[id^="deleteButton_"]');&ndash;&gt;-->
-<!--&lt;!&ndash;            allDeleteButtons.forEach(button => button.disabled = true);&ndash;&gt;-->
-
-
-<!--&lt;!&ndash;            const deleteButton = document.getElementById(`deleteButton_${income_id}`);&ndash;&gt;-->
-<!--&lt;!&ndash;            if(deleteButton){&ndash;&gt;-->
-<!--&lt;!&ndash;                deleteButton.disabled = false;&ndash;&gt;-->
-<!--&lt;!&ndash;            }&ndash;&gt;-->
-<!--&lt;!&ndash;        }&ndash;&gt;-->
-
-<!--        function toggleDeleteButton(income_id) {-->
-<!--    // Disable all delete buttons first-->
-<!--    const allDeleteButtons = document.querySelectorAll('button[id^="deleteButton_"]');-->
-<!--    allDeleteButtons.forEach(button => button.disabled = true);-->
-
-<!--    // Enable the delete button for the selected income-->
-<!--    const deleteButton = document.getElementById(`deleteButton_${income_id}`);-->
-<!--    if (deleteButton) {-->
-<!--        deleteButton.disabled = false;-->
-<!--    }-->
-<!--}-->
-
-<!--    </script>-->
-
-<!--    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>-->
-<!--    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>-->
-<!--    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>-->
-<!--</body>-->
-<!--</html>-->
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Income List</title>
+    <title>User Home</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!--    <meta name="_csrf" content="${_csrf.token}">-->
-<!--    <meta name="_csrf_header" content="${_csrf.headerName}">-->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        .totals-container {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-        }
-        .totals-box {
-            width: 45%;
-            padding: 20px;
-            border: 2px solid #ccc;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .total-income {
-            color: green;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        .total-expense {
-            color: red;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        .totals-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<h2>Welcome to Home Page</h2>
-<p>Logged in as User ID: <span th:text="${userId}"></span></p>
+<body class="bg-gray-100 text-gray-900">
 
-<div id="budgetAlert" class="alert" style="display: none; text-align: center; padding: 15px; margin: 20px; border-radius: 8px; font-size: 1.2rem; font-weight: bold;">
-    <span id="budgetMessage"></span>
-    <div class="progress" style="height: 10px; margin-top: 10px;">
-        <div id="budgetProgress" class="progress-bar" role="progressbar" style="width: 0%;"></div>
+<!-- Navbar -->
+<nav class="bg-blue-600 p-4 text-white shadow-md">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+        <h1 class="text-xl font-semibold">Budget App</h1>
+
+        <!-- Mobile Menu Button -->
+        <button id="menuBtn" class="md:hidden bg-blue-700 px-3 py-2 rounded-md">
+            ☰
+        </button>
+
+        <!-- Navigation Links -->
+        <div id="navLinks" class="hidden md:flex space-x-4">
+            <a th:href="@{/userHome/addIncome(id=${userId})}" class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-700">Add Income</a>
+            <a th:href="@{/userHome/addExpense(id=${userId})}" class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-700">Add Expense</a>
+            <a th:href="@{/userHome/income-expense-trend(id=${userId})}" class="bg-green-500 px-4 py-2 rounded hover:bg-green-700">View Trends</a>
+            <a th:href="@{/userHome/budget/setLimit(id=${userId})}" class="bg-yellow-500 px-4 py-2 rounded hover:bg-yellow-700">Set Budget</a>
+            <a th:href="@{/userHome/income-expense-list(id=${userId})}" class="bg-purple-500 px-4 py-2 rounded hover:bg-purple-700">Income-Expense List</a>
+            <a th:href="@{/login}" class="bg-red-500 px-4 py-2 rounded hover:bg-red-700">Logout</a>
+        </div>
     </div>
-    <button onclick="dismissAlert()" class="btn btn-sm btn-light" style="margin-top: 10px;">Dismiss</button>
+
+    <!-- Mobile Dropdown -->
+    <div id="mobileMenu" class="hidden md:hidden flex flex-col space-y-2 mt-2">
+        <a th:href="@{/userHome/addIncome(id=${userId})}" class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-700">Add Income</a>
+        <a th:href="@{/userHome/addExpense(id=${userId})}" class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-700">Add Expense</a>
+        <a th:href="@{/userHome/income-expense-trend(id=${userId})}" class="bg-green-500 px-4 py-2 rounded hover:bg-green-700">View Trends</a>
+        <a th:href="@{/userHome/budget/setLimit(id=${userId})}" class="bg-yellow-500 px-4 py-2 rounded hover:bg-yellow-700">Set Budget</a>
+        <a th:href="@{/userHome/income-expense-list(id=${userId})}" class="bg-purple-500 px-4 py-2 rounded hover:bg-purple-700">Income-Expense List</a>
+        <a th:href="@{/login}" class="bg-red-500 px-4 py-2 rounded hover:bg-red-700">Logout</a>
+    </div>
+</nav>
+
+<!-- Script for Mobile Menu -->
+<script>
+    document.getElementById("menuBtn").addEventListener("click", function () {
+        document.getElementById("mobileMenu").classList.toggle("hidden");
+    });
+</script>
+
+<!-- Main Content -->
+<div class="max-w-4xl mx-auto mt-6 p-6 bg-white rounded-lg shadow-md">
+    <h2 class="text-2xl font-semibold">Welcome to Home Page</h2>
+    <p class="text-gray-600 mt-2">Logged in as <span class="font-bold" th:text="${firstName}"></span></p>
 </div>
 
-<div class="totals-container">
-    <div class="totals-box">
-        <div class="totals-title">Total Income</div>
-        <span class="total-income" th:text="${totalIncome}"></span>
-    </div>
-    <div class="totals-box">
-        <div class="totals-title">Total Expense</div>
-        <span class="total-expense" th:text="${totalExpense}"></span>
-    </div>
-</div>
-
-<h4>Income List</h4>
-<ul>
-    <li th:each="income : ${incomeList}">
-        Title: <span th:text="${income.title}"></span>,
-        Description: <span th:text="${income.description}"></span>,
-        Amount: <span th:text="${income.amount}"></span>
-
-        Automated:
-        <span th:if="${income.automatedStatus}" style="color: green;">Yes</span>
-        <span th:unless="${income.automatedStatus}" style="color: red;">No</span>
-
-        <!-- Automation Toggle -->
-        <form th:action="@{/userHome/toggleAutomation}" method="post" style="display: inline;">
-            <input type="hidden" name="incomeId" th:value="${income.income_id}" />
-            <input type="hidden" name="isAutomated" th:value="${income.automatedStatus}" />
-
-            <button type="submit" class="btn btn-secondary">
-                <span th:if="${income.automatedStatus}">Disable</span>
-                <span th:unless="${income.automatedStatus}">Enable</span>
-
-            </button>
-            <span th:unless="${income.automatedStatus}">
-                <select name="interval">
-                    <option value="" selected>-- Select Interval --</option>
-                    <option value="5s">5 Seconds</option>
-                    <option value="10s">10 Seconds</option>
-                    <option value="day">Day</option>
-                    <option value="week">Week</option>
-                    <option value="month">Month</option>
-                </select>
-            </span>
-        </form>
-
-
-        <!-- Delete Button -->
-        <form th:action="@{/userHome}" method="post" style="display: inline;">
-            <input type="hidden" name="id" th:value="${userId}" />
-            <input type="hidden" name="selectedIncome" th:value="${income.income_id}" />
-            <button type="submit" class="btn btn-danger">Delete</button>
-        </form>
-    </li>
-</ul>
-
-<h4>Expense List</h4>
-
-
-<ul>
-    <li th:each="expense : ${expenseList}">
-        Title: <span th:text="${expense.title}"></span>,
-        Description: <span th:text="${expense.description}"></span>,
-        Amount: <span th:text="${expense.amount}"></span>
-<!--        id: <spam th:text="${expense.expense_id}"></spam>-->
-
-        <form th:action="@{/userHome}" method="post" style="display: inline;">
-            <input type="hidden" name="id" th:value="${userId}" />
-            <input type="hidden" name="selectedExpense" th:value="${expense.expense_id}" />
-            <button type="submit" class="btn btn-danger">Delete</button>
-        </form>
-    </li>
-</ul>
-
-<a th:href="@{/userHome/addIncome(id=${userId})}">Add Income</a>
-<br />
-<a th:href="@{/userHome/addExpense(id=${userId})}">Add Expense</a>
-<br /><br />
-
-<a th:href="@{/userHome/income-expense-trend(id=${userId})}">Graphical Representation</a>
-
-<br />
-
-<a th:href="@{/userHome/budget/setLimit(id=${userId})}">Set Budget</a>
-<br />
-
-<a th:href="@{/login}">Logout</a>
-
-
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Budget Alerts -->
+<div id="budgetAlerts" class="max-w-4xl mx-auto mt-4"></div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        var totalExpense = parseFloat("[[${totalExpense}]]");
-        var budgetLimit = parseFloat("[[${budgetLimit}]]");
-        var alertBox = document.getElementById("budgetAlert");
-        var messageBox = document.getElementById("budgetMessage");
-        var progressBar = document.getElementById("budgetProgress");
+        var budgetAlertsContainer = document.getElementById("budgetAlerts");
+        var generalBudget = parseFloat("[[${budgetLimit}]]") || 0;
+        var totalExpense = parseFloat("[[${totalExpense}]]") || 0;
+        var categoryBudgets = JSON.parse('[[${categoryBudgetsJson}]]'.replace(/&quot;/g, '"'));
+        var categoryExpenses = JSON.parse('[[${categoryExpensesJson}]]'.replace(/&quot;/g, '"'));
+        var categoryNames = JSON.parse('[[${categoryNamesJson}]]'.replace(/&quot;/g, '"'));
 
-        if (!isNaN(totalExpense) && !isNaN(budgetLimit) && budgetLimit > 0) {
-            var percentageUsed = (totalExpense / budgetLimit) * 100;
-            progressBar.style.width = percentageUsed + "%";
-
+        if (generalBudget > 0) {
+            var percentageUsed = (totalExpense / generalBudget) * 100;
             if (percentageUsed >= 100) {
-                alertBox.style.display = "block";
-                alertBox.style.backgroundColor = "#dc3545"; // Red for exceeded budget
-                alertBox.style.color = "white";
-                messageBox.innerText = "⚠️ Budget Limit Exceeded! Reduce expenses to stay within your budget.";
+                budgetAlertsContainer.innerHTML += `<div class="p-4 bg-red-500 text-white rounded-md shadow-md mt-2">⚠️ General Budget Exceeded!</div>`;
             } else if (percentageUsed >= 80) {
-                alertBox.style.display = "block";
-                alertBox.style.backgroundColor = "#ffc107"; // Yellow for warning
-                alertBox.style.color = "black";
-                messageBox.innerText = "⚠️ Warning: You have used over 80% of your budget!";
+                budgetAlertsContainer.innerHTML += `<div class="p-4 bg-yellow-300 text-black rounded-md shadow-md mt-2">⚠️ Warning: Expenses over 80% of budget!</div>`;
             }
         }
-    });
 
-    function dismissAlert() {
-        document.getElementById("budgetAlert").style.display = "none";
-    }
+        Object.keys(categoryBudgets).forEach(categoryId => {
+            var categoryLimit = categoryBudgets[categoryId];
+            var categoryExpense = categoryExpenses[categoryId] || 0;
+            var percentageUsed = (categoryExpense / categoryLimit) * 100;
+            var categoryName = categoryNames[categoryId] || "Unknown Category";
+
+            if (percentageUsed >= 100) {
+                budgetAlertsContainer.innerHTML += `<div class="p-4 bg-red-500 text-white rounded-md shadow-md mt-2">⚠️ ${categoryName} Budget Exceeded!</div>`;
+            } else if (percentageUsed >= 80) {
+                budgetAlertsContainer.innerHTML += `<div class="p-4 bg-yellow-300 text-black rounded-md shadow-md mt-2">⚠️ Warning: ${categoryName} expenses over 80%!</div>`;
+            }
+        });
+    });
 </script>
+
+<!-- Totals -->
+<div class="max-w-4xl mx-auto mt-6 flex gap-6">
+    <div class="w-1/2 p-4 bg-green-100 text-green-700 text-center rounded-md shadow-md">
+        <h3 class="font-semibold">Total Income</h3>
+        <p class="text-xl font-bold" th:text="${totalIncome}"></p>
+    </div>
+    <div class="w-1/2 p-4 bg-red-100 text-red-700 text-center rounded-md shadow-md">
+        <h3 class="font-semibold">Total Expense</h3>
+        <p class="text-xl font-bold" th:text="${totalExpense}"></p>
+    </div>
+</div>
+
+
+<!-- Income List -->
+<div class="max-w-4xl mx-auto mt-6 p-6 bg-white rounded-lg shadow-md">
+    <h4 class="text-xl font-semibold mb-4">Income List</h4>
+    <ul>
+        <li th:each="incomeDTO : ${incomeList}" class="border-b py-4 flex justify-between items-center">
+            <div>
+                <span class="font-semibold text-lg" th:text="${incomeDTO.income.title}"></span>
+                <p class="text-sm text-gray-500">Category: <span th:text="${incomeDTO.categoryName}"></span></p>
+                <p class="text-gray-600">Amount: <span class="font-semibold" th:text="${incomeDTO.income.amount}"></span></p>
+                <p class="mt-1">
+                    Automated:
+                    <span th:if="${incomeDTO.income.automatedStatus}" class="text-green-600 font-bold">Yes</span>
+                    <span th:unless="${incomeDTO.income.automatedStatus}" class="text-red-600 font-bold">No</span>
+                </p>
+            </div>
+            <div class="flex gap-2">
+                <!-- Show Disable Button ONLY if automatedStatus is Yes -->
+                <form th:if="${incomeDTO.income.automatedStatus}" th:action="@{/userHome/toggleAutomation}" method="post">
+                    <input type="hidden" name="incomeId" th:value="${incomeDTO.income.income_id}" />
+                    <input type="hidden" name="automatedStatus" th:value="${incomeDTO.income.automatedStatus}" />
+                    <button type="submit" class="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-700">Disable</button>
+                </form>
+
+
+                <form th:action="@{/userHome}" method="post">
+                    <input type="hidden" name="id" th:value="${userId}" />
+                    <input type="hidden" name="selectedIncome" th:value="${incomeDTO.income.income_id}" />
+                    <input type="hidden" name="automatedStatus" th:value="${incomeDTO.income.automatedStatus}" />
+                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700">Delete</button>
+                </form>
+            </div>
+        </li>
+    </ul>
+</div>
+
+<!-- Expense List -->
+<div class="max-w-4xl mx-auto mt-6 p-6 bg-white rounded-lg shadow-md">
+    <h4 class="text-xl font-semibold mb-4">Expense List</h4>
+    <ul th:if="${expenseList != null and not #lists.isEmpty(expenseList)}">
+        <li th:each="expenseDTO : ${expenseList}" class="border-b py-4 flex justify-between items-center">
+            <div>
+                <span class="font-semibold text-lg" th:text="${expenseDTO.expense.title}"></span>
+                <p class="text-sm text-gray-500">Category: <span th:text="${expenseDTO.categoryName}"></span></p>
+                <p class="text-gray-600">Amount: <span class="font-semibold" th:text="${expenseDTO.expense.amount}"></span></p>
+                <p class="mt-1">
+                    Automated:
+                    <span th:if="${expenseDTO.expense.automatedStatus}" class="text-green-600 font-bold">Yes</span>
+                    <span th:unless="${expenseDTO.expense.automatedStatus}" class="text-red-600 font-bold">No</span>
+                </p>
+
+            </div>
+            <div>
+
+                <form th:if="${expenseDTO.expense.automatedStatus}" th:action="@{/userHome/toggleExpenseAutomation}" method="post">
+                    <input type="hidden" name="expenseId" th:value="${expenseDTO.expense.expense_id}" />
+                    <input type="hidden" name="automatedStatus" th:value="${expenseDTO.expense.automatedStatus}" />
+                    <button type="submit" class="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-700">Disable</button>
+                </form>
+
+                <form th:action="@{/userHome}" method="post">
+                    <input type="hidden" name="id" th:value="${userId}" />
+                    <input type="hidden" name="selectedExpense" th:value="${expenseDTO.expense.expense_id}" />
+                    <input type="hidden" name="automatedStatus" th:value="${expenseDTO.expense.automatedStatus}" />
+                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700">Delete</button>
+                </form>
+            </div>
+        </li>
+    </ul>
+</div>
+
 
 
 </body>
 </html>
-
-
-
-
-

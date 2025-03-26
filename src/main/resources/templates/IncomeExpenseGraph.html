@@ -1,30 +1,32 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-    <title>Income vs Expense Trend</title>
     <meta charset="UTF-8">
+    <title>Income vs Expense Trend</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Charts -->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-
-        google.charts.load('current', {'packages':['corechart']});
+        google.charts.load('current', { 'packages': ['corechart'] });
         google.charts.setOnLoadCallback(drawChart);
 
-        function drawChart(){
+        function drawChart() {
+            let userId = document.getElementById("userId").value;
+            let timeRange = document.getElementById("timeRange").value;
 
-        let userId = document.getElementById("userId").value;
-        let timeRange = document.getElementById("timeRange").value;
-        console.log(timeRange);
-        console.log(userId);
-
+            // Show loading text
+            document.getElementById("chart_div").innerHTML = '<p class="text-center text-gray-500">Loading chart...</p>';
 
             fetch(`/userHome/income-expense-trend-data?id=${userId}&range=${timeRange}`)
                 .then(response => response.json())
                 .then(data => {
+                    console.log("Chart Data:", data);
+                    let chartData = google.visualization.arrayToDataTable(data);
 
-                console.log("chart data",data);
-                    var chartData = google.visualization.arrayToDataTable(data);
-
-                    var options = {
+                    let options = {
                         title: 'Income vs Expense',
                         curveType: 'function',
                         legend: { position: 'bottom' },
@@ -35,24 +37,52 @@
                         lineWidth: 3
                     };
 
-        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+                    let chart = new google.visualization.LineChart(document.getElementById('chart_div'));
                     chart.draw(chartData, options);
                 })
-                .catch(error => console.error('Error loading chart data:', error));
+                .catch(error => {
+                    console.error('Error loading chart data:', error);
+                    document.getElementById("chart_div").innerHTML = '<p class="text-center text-red-500">Failed to load chart data.</p>';
+                });
         }
     </script>
-
 </head>
-<body>
-<h2>Income vs Expense Trend</h2>
-<select id="timeRange" onchange="drawChart()">
-    <option value="30days">Last 30 Days</option>
-    <option value="month">This Month</option>
-    <option value="lastMonth">Last Month</option>
-    <option value="year">This Year</option>
-</select>
+<body class="bg-gray-100 text-gray-900">
 
-<input type="hidden" id="userId" th:value="${userId}">
-<div id="chart_div" style="width: 900px; height: 500px;"></div>
+<!-- Navbar -->
+<nav class="bg-blue-600 p-4 text-white shadow-md">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+        <h1 class="text-xl font-semibold">Income vs Expense Trend</h1>
+        <a th:href="@{'/userHome?id=' + ${userId}}" class="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200">Home</a>
+    </div>
+</nav>
+
+<!-- Page Container -->
+<div class="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+
+    <!-- Title -->
+    <h2 class="text-2xl font-semibold text-center mb-4">Income vs Expense Trend</h2>
+
+    <!-- Time Range Dropdown -->
+    <div class="flex justify-center mb-4">
+        <label for="timeRange" class="mr-2 font-medium text-gray-700">Select Time Range:</label>
+        <select id="timeRange" onchange="drawChart()"
+                class="p-2 border rounded-md bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="30days">Last 30 Days</option>
+            <option value="month">This Month</option>
+            <option value="lastMonth">Last Month</option>
+            <option value="year">This Year</option>
+        </select>
+    </div>
+
+    <!-- Hidden User ID -->
+    <input type="hidden" id="userId" th:value="${userId}">
+
+    <!-- Chart Container -->
+    <div id="chart_div" class="w-full h-96 flex items-center justify-center">
+        <p class="text-gray-500">Loading chart...</p>
+    </div>
+</div>
+
 </body>
 </html>

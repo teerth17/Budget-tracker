@@ -10,8 +10,21 @@ public class StartupScheduler {
     @Autowired
     private AddUpdateIncomeService addUpdateIncomeService;
 
+    @Autowired
+    private AddExpenseService addExpenseService;
+
     @PostConstruct
     public void initializeSchedulers(){
-        addUpdateIncomeService.initializeScheduleIncomes();
+        try {
+            System.out.println("Initializing income schedulers...");
+            addUpdateIncomeService.initializeScheduleIncomes();
+
+            System.out.println("Initializing expense schedulers...");
+            addExpenseService.initializeScheduleExpenses();
+
+            System.out.println("Schedulers initialized successfully.");
+        } catch (Exception e) {
+            System.err.println("Error initializing schedulers: " + e.getMessage());
+        }
     }
 }

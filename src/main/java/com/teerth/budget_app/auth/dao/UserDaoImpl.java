@@ -85,6 +85,12 @@ public class UserDaoImpl implements UserDao {
         return user;
     }
 
+    @Override
+    public String getFirstname(UUID account_id){
+        String SQL = "select firstName from profile where account_id=?";
+        return jdbcTemplate.queryForObject(SQL,new Object[]{account_id}, String.class);
+    }
+
     class UserMapper implements  RowMapper<User>{
         public User mapRow(ResultSet rs,int rowNum) throws SQLException{
             User user = new User();
