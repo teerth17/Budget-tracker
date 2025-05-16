@@ -28,23 +28,23 @@ CREATE TABLE IF NOT EXISTS category (
     type VARCHAR(10) NOT NULL  -- 'expense' or 'income'
 );
 
---INSERT INTO category (name, type) VALUES
---('Groceries', 'expense'),
---('Dining', 'expense'),
---('Transportation', 'expense'),
---('Entertainment', 'expense'),
---('Bills', 'expense'),
---('Healthcare', 'expense'),
---('Education', 'expense'),
---('Personal Care', 'expense'),
---('Shopping', 'expense'),
---('Others', 'expense');
---
---INSERT INTO category (name, type) VALUES
---('Salary', 'income'),
---('Investment', 'income'),
---('Gift', 'income'),
---('Other Income', 'income');
+INSERT INTO category (name, type) VALUES
+('Groceries', 'expense'),
+('Dining', 'expense'),
+('Transportation', 'expense'),
+('Entertainment', 'expense'),
+('Bills', 'expense'),
+('Healthcare', 'expense'),
+('Education', 'expense'),
+('Personal Care', 'expense'),
+('Shopping', 'expense'),
+('Others', 'expense');
+
+INSERT INTO category (name, type) VALUES
+('Salary', 'income'),
+('Investment', 'income'),
+('Gift', 'income'),
+('Other Income', 'income');
 
 CREATE TABLE IF NOT EXISTS budget(
     budget_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
